@@ -161,6 +161,31 @@ class XCore:
         except Exception as e:
             print("[*] 推送二维码到钉钉失败" + str(e))
 
+    def sendPushPlus(self, msg, mode = "QR", QRID = 0):
+        token = xue_cfg["useWS"]["PPtoken"]
+        headers = {"Content-Type": "application/json"}  # 定义数据类型
+        if mode == "QR":
+            data = {
+                "token": token,
+                "title": "学习强国扫码登录",
+                "template": "markdown",
+                "content":  "#### 学习强国登录学习\n > ![](" + msg + ")\n > ###### 二维码生成时间" + \
+                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) + "\n > ###### 二维码ID:" + str(QRID)
+                              
+            }
+        else:
+            data = {
+                "token": token,
+                "title": "学习情况",
+                "template": "markdown",
+                "content": msg
+            }
+        try:
+            res = requests.post("http://www.pushplus.plus/send", data=json.dumps(data), headers=headers)
+            print("已通过PushPlus发送成功")
+        except Exception as e:
+            input("发送失败. 错误信息: " + str(e))       
+
     def getQRcode(self):
         try:
             # 获取iframe内的二维码
