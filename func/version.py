@@ -8,10 +8,10 @@ def get_version(verstr):
 def up_info():
     print(color.yellow("[*] 正在联网获取更新信息..."))
 
-    __Version = "v20210618"
+    __Version = "v20220525"
 
     __INFO = "By Kenf"
-    try:
+    try:        
         update_log = requests.get("http://1.15.144.22/Update.html").content.decode("utf8")
         update_log = update_log.split("\n")
         print(color.yellow("[*] " + __INFO))
@@ -37,8 +37,8 @@ def up_info():
             os.system("pause")
             os._exit(0)
     except:
-        print(color.yellow("[*] 验证版本信息网络错误，程序中断"))
-        os._exit(0)
+        print(color.yellow("[*] 验证版本信息网络错误"))
+        # os._exit(0)
 
 if __name__ == '__main__':
     up_info()

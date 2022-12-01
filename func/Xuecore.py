@@ -30,7 +30,8 @@ class XCore:
             else:
                 print("@启动失败，程序包已损坏")
                 os._exit(0)
-                
+            # chrome_app_path = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
+            # chrome_driver_path = get_appsyspatch() + "\App\chromedriver.exe"                
             self.options.binary_location = chrome_app_path
             #初始二维码窗口大小
             windows_size = '--window-size=500,450'
@@ -70,11 +71,14 @@ class XCore:
             self.webdriver = webdriver
             self.driver = self.webdriver.Chrome(chrome_driver_path,chrome_options=self.options)
             #加载屏蔽Webdriver标识脚本
-            if nofake == False:            
-                net_stealth = requests.get("http://1.15.144.22/stealth.min.js").content.decode("utf8")
-                self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-                    "source": net_stealth
-                })
+            if nofake == False:    
+                try:        
+                    net_stealth = requests.get("https://cdn.jsdelivr.net/gh/requireCool/stealth.min.js/stealth.min.js").content.decode("utf8")
+                    self.driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                        "source": net_stealth
+                    })
+                except:
+                    pass
         except:
             print("=" * 60)
             print("内置驱动初始化失败")
@@ -228,14 +232,22 @@ class XCore:
             if check_hk == "no":
                 break
             if check_hk == "check_hk":
+                print("DEBUG-1016: 检测到滑块验证，正在尝试解锁 " + str(hk_num) + "次")
                 try:
-                    hk_button = self.driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
-                    print("DEBUG-1016: 检测到滑块验证，正在尝试解锁 " + str(hk_num) + "次")
+                    try:
+                        hk_button = self.driver.find_element_by_xpath('//*[@id="nc_1_n1z"]')
+                    except:                        
+                        try:
+                            hk_button = self.driver.find_element_by_xpath('//*[@id="nc_3_n1z"]')
+                        except:
+                            hk_num += 1
+                            continue                    
                     hk_action = ActionChains(self.driver)
-                    hk_action.click_and_hold(hk_button)
-                    hk_action.move_by_offset(265,0)
-                    hk_action.release()
-                    hk_action.perform()
+                    hk_action.click_and_hold(hk_button).perform()
+                    time.sleep(1)
+                    hk_action.move_by_offset(265,0).perform()
+                    hk_action.release().perform()
+                    # hk_action.perform()
                     time.sleep(5)
                     hk_num += 1
                     check_hk_num += 1
@@ -422,6 +434,7 @@ class XCore:
             model_selector = "#app .items .item button"
 
         for m in range(len(answer_page)-1, -1, -1):
+            answer_page = self.driver.find_elements_by_css_selector("#app .ant-pagination .ant-pagination-item")
             n = answer_page[m]
             print('获取'+ model_name +'：' + str(len(answer_page)) + '页，正在加载第 ' + str(m+1) + ' 页')
             answer_page[m].click()

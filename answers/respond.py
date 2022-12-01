@@ -19,14 +19,14 @@ def respond(model, cookies, scores):
         score["max"] = scores["weekly_max"]
         score["loading_model"] = "正在加载每周答题网页模块，请稍等..."
         score["loaded_model"] = "已加载每周答题模块"
-        score["model_xpath"] = '//*[@id="app"]/div/div[2]/div/div[3]/div[2]/div[6]/div[2]/div[2]/div' #每周答题的 答题按钮
+        score["model_xpath"] = '//*[@id="app"]/div/div[2]/div/div[3]/div[2]/div[7]/div[2]/div[2]/div' #每周答题的 答题按钮
     
     elif model == "special":
         score["now"] = scores["special"]
         score["max"] = scores["special_max"]
         score["loading_model"] = "正在加载专项答题网页模块，请稍等..."
         score["loaded_model"] = "已加载专项答题模块"
-        score["model_xpath"] = '//*[@id="app"]/div/div[2]/div/div[3]/div[2]/div[7]/div[2]/div[2]/div' #专项答题的 答题按钮
+        score["model_xpath"] = '//*[@id="app"]/div/div[2]/div/div[3]/div[2]/div[6]/div[2]/div[2]/div' #专项答题的 答题按钮
     
         
     if score["now"] < score["max"]:

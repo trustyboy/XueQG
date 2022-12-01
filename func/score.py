@@ -14,16 +14,17 @@ def get_userScore(cookies):
     userInfo_todayTotalScore = int(json.loads(user_todayTotalScore_json)["data"]["score"])
     #获取当前用户今天学习分数API
     user_rateScore_json = requests.get(user_rateScore_url, cookies=jar, headers={'Cache-Control': 'no-cache'}).content.decode("utf8")
-    userInfo_rateScore = json.loads(user_rateScore_json)["data"]["dayScoreDtos"]
+    userInfo_rateScore = json.loads(user_rateScore_json)["data"]["taskProgress"]
     
-    rule_list = [1, 2, 9, 1002, 1003, 6, 5, 4] #显示得分模块
+    rule_list = ["1", "2", "9", "1002", "1003", "6", "5", "4"] #显示得分模块
     score_list= [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] #获取今天得分列表
     score_max = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0] #获取今天得分上限列表
     for i in userInfo_rateScore:
        for j in range(len(rule_list)):
-            if i["ruleId"] == rule_list[j]:
-                score_list[j] = int(i["currentScore"])
-                score_max[j] = int(i["dayMaxScore"])
+            for k in range(len(i["taskCode"])):
+                if i["taskCode"][k] == rule_list[j]:
+                    score_list[j] = int(i["currentScore"])
+                    score_max[j] = int(i["dayMaxScore"])
             
     # 阅读文章，视听学习，登录，文章时长，视听学习时长，每日答题，每周答题，专项答题
     userInfo_scores = {}

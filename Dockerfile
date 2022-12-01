@@ -13,6 +13,7 @@ RUN set -x; buildDeps='wget locales' \
     && rm -f google-chrome-stable_88.0.4324.182-1_amd64.deb \
     && apt-get clean
 COPY upload /data/XueQG/
+COPY App/chromedriver  /usr/lib/chromium/chromedriver
 ENV LC_ALL=zh_CN.UTF-8
 WORKDIR /data/XueQG
 ENTRYPOINT ["./XueQG"]
