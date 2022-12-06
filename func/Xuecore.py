@@ -9,6 +9,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
 from func.dingding import DingDingHandler
+from pyzbar.pyzbar import decode
+from PIL import Image
+from io import BytesIO
+import re
+import urllib.parse
 
 class XCore:
 
@@ -21,17 +26,15 @@ class XCore:
             #chrome_driver_path = get_appsyspatch() + "\App\chromedriver.exe"
 
             #判断Chrome 位置，linux&macos 后期再加入输入参数，暂时统一处理
-            if os.path.exists(get_appsyspatch() + "\App\chrome.exe"): # win
-                chrome_app_path = get_appsyspatch() + "\App\chrome.exe"
+            if os.path.exists("C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"): # win
+                chrome_app_path = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
                 chrome_driver_path = get_appsyspatch() + "\App\chromedriver.exe"
-            elif os.path.exists(get_appsyspatch() + "/App/chrome"):  # linux & macos
-                chrome_app_path = get_appsyspatch() + "/App/chrome"
-                chrome_driver_path = get_appsyspatch() + "/App/chromedriver"
+            elif os.path.exists("/usr/lib/chromium/chromium"):  # linux & macos
+                chrome_app_path = "/usr/lib/chromium/chromium"
+                chrome_driver_path = "/usr/lib/chromium/chromedriver"
             else:
                 print("@启动失败，程序包已损坏")
-                os._exit(0)
-            # chrome_app_path = "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
-            # chrome_driver_path = get_appsyspatch() + "\App\chromedriver.exe"                
+                os._exit(0)                
             self.options.binary_location = chrome_app_path
             #初始二维码窗口大小
             windows_size = '--window-size=500,450'
@@ -42,6 +45,7 @@ class XCore:
             if nohead:
                 self.options.add_argument('--headless')
                 self.options.add_argument('--disable-extensions')
+                self.options.add_argument('--disable-dev-shm-usage')
                 self.options.add_argument('--disable-gpu')
                 self.options.add_argument('--no-sandbox')
                 windows_size = '--window-size=1920,1080'
@@ -97,8 +101,16 @@ class XCore:
    
     def get_url(self, url):
         self.driver.get(url)
+
+    def base64_to_image(self, base64_str):
+        base64_data = re.sub('^data:image/.+;base64,', '', base64_str)
+        byte_data = base64.b64decode(base64_data)
+        image_data = BytesIO(byte_data)
+        img = Image.open(image_data)
+        return img
         
     def logging(self):
+        
         print("正在打开二维码登陆界面,请稍后...")
         self.driver.get("https://pc.xuexi.cn/points/login.html")
         #删除登录二维码界面多余元素
@@ -128,9 +140,14 @@ class XCore:
         
         try: 
             # 取出iframe中二维码，并发往钉钉
-            if xue_cfg["useWS"]["SendDingDing"] == "1":
+            QRcode_src = self.getQRcode()
+            img = self.base64_to_image(base64_str = QRcode_src)
+            decocdeQR = decode(img)
+            url = "dtxuexi://appclient/page/study_feeds?url=" + urllib.parse.quote(decocdeQR[0].data.decode('ascii'))
+            print(url)
+            if os.environ.get("PushMode") == "2" or xue_cfg["useWS"]["SendDingDing"] == "1":
                 print("二维码将发往钉钉机器人...\n" + "=" * 60)
-                URID = self.toDingDing()
+                URID = self.sendDingDing(msg = url, mode = "link")
         except KeyError as e:
             print("未检测到DingDing发送二维码配置，请手动扫描二维码登陆...")
             URID = 0
@@ -143,17 +160,33 @@ class XCore:
             return cookies, URID
         except Exception as e:
             input("扫描二维码超时... 按回车键退出程序. 错误信息: " + str(e))
-            os._exit(0)
+            os._exit(0)       
 
-    def sendDingDing(self, msg):
-        token = xue_cfg["useWS"]["DDtoken"]
-        secret = xue_cfg["useWS"]["DDsecret"]
+    def sendDingDing(self, msg, mode = "msg"):
+        token = ""
+        if os.environ.get("DDtoken") != None:
+            token = os.environ.get("DDtoken")
+        else:
+            token = xue_cfg["useWS"]["DDtoken"]
+        secret = ""
+        if os.environ.get("DDsecret") != None:
+            secret = os.environ.get("DDsecret")
+        else:
+            secret = xue_cfg["useWS"]["DDsecret"]        
         ddhandler = DingDingHandler(token, secret)
-        ddhandler.ddmsgsend(msg, mode = "msg")
+        ddhandler.ddmsgsend(msg, mode)
 
-    def toDingDing(self):
-        token = xue_cfg["useWS"]["DDtoken"]
-        secret = xue_cfg["useWS"]["DDsecret"]
+    def toDingDing(self):        
+        token = ""
+        if os.environ.get("DDtoken") != None:
+            token = os.environ.get("DDtoken")
+        else:
+            token = xue_cfg["useWS"]["DDtoken"]
+        secret = ""
+        if os.environ.get("DDsecret") != None:
+            secret = os.environ.get("DDsecret")
+        else:
+            secret = xue_cfg["useWS"]["DDsecret"]  
         ddhandler = DingDingHandler(token, secret)
         QRcode_src = self.getQRcode()
         try:

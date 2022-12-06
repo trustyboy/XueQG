@@ -31,9 +31,9 @@ if __name__ == '__main__':
         cookies = user.check_user_cookie()
 
     if not cookies or user_list == 2:
-        print("\n未找到有效登录信息，需要登录。按任意键继续")
-        os.system("pause")
-        driver_login = XCore(nohead=False)
+        # print("\n未找到有效登录信息，需要登录。按任意键继续")
+        # os.system("pause")
+        driver_login = XCore(noimg=False, nohead=True, nofake=False)
         cookies, QRID = driver_login.logging()
         driver_login.quit()
     

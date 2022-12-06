@@ -24,12 +24,12 @@ def load_config(nologo = False):
         os.mkdir(sys_patch + "/Config")
     if(not os.path.exists(sys_patch + "/User")):
         os.mkdir(sys_patch + "/User")
-    if(not os.path.exists(sys_patch + "/Config/config.cfg")):
+    if(not os.path.exists(sys_patch + "/Config/Config.cfg")):
         print("=" * 60)
-        print("@启动失败，缺少配置文件: Config/config.cfg")
+        print("@启动失败，缺少配置文件: Config/Config.cfg")
         os._exit(0)
     else:
-        xue_cfg.read(sys_patch + "/Config/config.cfg", encoding='utf-8')    
+        xue_cfg.read(sys_patch + "/Config/Config.cfg", encoding='utf-8')    
     return xue_cfg
     
 def save_json_data(filename, filedata):
