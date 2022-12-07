@@ -32,6 +32,9 @@ class XCore:
             elif os.path.exists("/usr/lib/chromium/chromium"):  # linux & macos
                 chrome_app_path = "/usr/lib/chromium/chromium"
                 chrome_driver_path = "/usr/lib/chromium/chromedriver"
+            elif os.path.exists("/usr/lib/chromium/chrome"):  # alpine
+                chrome_app_path = "/usr/lib/chromium/chrome"
+                chrome_driver_path = "/usr/lib/chromium/chromedriver"
             else:
                 print("@启动失败，程序包已损坏")
                 os._exit(0)                
