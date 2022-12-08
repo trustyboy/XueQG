@@ -44,7 +44,7 @@ if __name__ == '__main__':
     scores = score.show_userScore(cookies)    
     #学习情况发送到钉钉
     try:
-        if xue_cfg["useWS"]["SendDingDing"] == "1":
+        if os.environ.get("PushMode") == "2" or xue_cfg["useWS"]["SendDingDing"] == "1":
             if QRID == 0:
                 QRmsg = ""
             else:
@@ -129,7 +129,7 @@ if __name__ == '__main__':
     scores = score.get_userScore(cookies)
     #学习结束情况发送到钉钉
     try:
-        if xue_cfg["useWS"]["SendDingDing"] == "1":    
+        if os.environ.get("PushMode") == "2" or xue_cfg["useWS"]["SendDingDing"] == "1":    
             send_msg = "#### " + nick + "学习结束 \n > ##### 学习总积分: " + str(scores["total"]) + "\t今日得分: " + str(scores["today"]) + \
                     "\n > ###### 阅读文章: " + str(scores["article_num"]) + "/" + str(scores["article_num_max"]) + \
                     ", 视听学习:" + str(scores["video_num"]) + "/" + str(scores["video_num_max"]) + \

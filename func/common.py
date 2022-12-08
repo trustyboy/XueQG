@@ -66,8 +66,16 @@ def get_time():
     
 def sendDingDing(msg):
     xue_cfg = load_config(True)
-    token = xue_cfg["useWS"]["DDtoken"]
-    secret = xue_cfg["useWS"]["DDsecret"]
+    token = ""
+    if os.environ.get("DDtoken") != None:
+        token = os.environ.get("DDtoken")
+    else:
+        token = xue_cfg["useWS"]["DDtoken"]
+    secret = ""
+    if os.environ.get("DDsecret") != None:
+        secret = os.environ.get("DDsecret")
+    else:
+        secret = xue_cfg["useWS"]["DDsecret"]
     ddhandler = DingDingHandler(token, secret)
     ddhandler.ddmsgsend(msg, "msg")
 
